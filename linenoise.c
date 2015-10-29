@@ -118,6 +118,7 @@
 
 #define LINENOISE_DEFAULT_HISTORY_MAX_LEN 100
 #define LINENOISE_MAX_LINE 4096
+#define UNUSED(x) (void)(x)
 static char *unsupported_term[] = {"dumb","cons25","emacs",NULL};
 static linenoiseCompletionCallback *completionCallback = NULL;
 static linenoiseHintsCallback *hintsCallback = NULL;
@@ -196,17 +197,15 @@ FILE *lndebug_fp = NULL;
 
 /* ========================== Encoding functions ============================= */
 
-#define UNUSED(x) (void)(x)
-
 /* Get byte length and column length of the previous character */
 static size_t defaultPrevCharLen(const char *buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf);
     UNUSED(buf_len);
     if (pos == 0) {
-        *col_len = 0;
+        if (col_len != NULL) *col_len = 0;
         return 0;
     }
-    *col_len = 1;
+    if (col_len != NULL) *col_len = 1;
     return 1;
 }
 
@@ -214,10 +213,10 @@ static size_t defaultPrevCharLen(const char *buf, size_t buf_len, size_t pos, si
 static size_t defaultNextCharLen(const char *buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf);
     if (pos == buf_len) {
-        *col_len = 0;
+        if (col_len != NULL) *col_len = 0;
         return 0;
     }
-    *col_len = 1;
+    if (col_len != NULL) *col_len = 1;
     return 1;
 }
 
@@ -230,8 +229,6 @@ static size_t defaultReadCode(int fd, char *buf, size_t buf_len, int* c) {
     }
     return nread;
 }
-
-#undef UNUSED
 
 /* Set default encoding functions */
 static linenoisePrevCharLen *prevCharLen = defaultPrevCharLen;
@@ -254,7 +251,7 @@ static size_t columnPos(const char *buf, size_t buf_len, size_t pos) {
     size_t off = 0;
     while (off < pos) {
         size_t col_len;
-        size_t len = nextCharLen(buf, buf_len, off, &col_len);
+        size_t len = nextCharLen(buf,buf_len,off,&col_len);
         off += len;
         ret += col_len;
     }
@@ -269,7 +266,7 @@ static size_t columnPosForMultiLine(const char *buf, size_t buf_len, size_t pos,
     size_t off = 0;
     while (off < buf_len) {
         size_t col_len;
-        size_t len = nextCharLen(buf, buf_len, off, &col_len);
+        size_t len = nextCharLen(buf,buf_len,off,&col_len);
 
         int dif = (int)(colwid + col_len) - (int)cols;
         if (dif > 0) {
@@ -284,7 +281,6 @@ static size_t columnPosForMultiLine(const char *buf, size_t buf_len, size_t pos,
         if (off >= pos) {
             break;
         }
-
         off += len;
         ret += col_len;
     }
@@ -600,10 +596,9 @@ static int isAnsiEscape(const char *buf, size_t buf_len, size_t* len) {
         size_t off = 2;
         while (off < buf_len) {
             switch (buf[off++]) {
-            case 'A': case 'B': case 'C': case 'D':
-            case 'E': case 'F': case 'G': case 'H':
-            case 'J': case 'K': case 'S': case 'T':
-            case 'f': case 'm':
+            case 'A': case 'B': case 'C': case 'D': case 'E':
+            case 'F': case 'G': case 'H': case 'J': case 'K':
+            case 'S': case 'T': case 'f': case 'm':
                 *len = off;
                 return 1;
             }
@@ -617,7 +612,6 @@ static int isAnsiEscape(const char *buf, size_t buf_len, size_t* len) {
 static size_t promptTextColumnLen(const char *prompt, size_t plen) {
     char buf[LINENOISE_MAX_LINE];
     size_t buf_len = 0;
-
     size_t off = 0;
     while (off < plen) {
         size_t len;
@@ -627,7 +621,6 @@ static size_t promptTextColumnLen(const char *prompt, size_t plen) {
         }
         buf[buf_len++] = prompt[off++];
     }
-
     return columnPos(buf,buf_len,buf_len);
 }
 
@@ -637,7 +630,7 @@ static size_t promptTextColumnLen(const char *prompt, size_t plen) {
  * cursor position, and number of columns of the terminal. */
 static void refreshSingleLine(struct linenoiseState *l) {
     char seq[64];
-    size_t pcollen = promptTextColumnLen(l->prompt, strlen(l->prompt));
+    size_t pcollen = promptTextColumnLen(l->prompt,strlen(l->prompt));
     int fd = l->ofd;
     char *buf = l->buf;
     size_t len = l->len;
@@ -645,15 +638,13 @@ static void refreshSingleLine(struct linenoiseState *l) {
     struct abuf ab;
 
     while((pcollen+columnPos(buf,len,pos)) >= l->cols) {
-        size_t col_len;
-        int chlen = nextCharLen(buf,len,0,&col_len);
+        int chlen = nextCharLen(buf,len,0,NULL);
         buf += chlen;
         len -= chlen;
         pos -= chlen;
     }
     while (pcollen+columnPos(buf,len,len) > l->cols) {
-        size_t col_len;
-        len -= prevCharLen(buf,len,len,&col_len);
+        len -= prevCharLen(buf,len,len,NULL);
     }
 
     abInit(&ab);
@@ -681,7 +672,7 @@ static void refreshSingleLine(struct linenoiseState *l) {
  * cursor position, and number of columns of the terminal. */
 static void refreshMultiLine(struct linenoiseState *l) {
     char seq[64];
-    size_t pcollen = promptTextColumnLen(l->prompt, strlen(l->prompt));
+    size_t pcollen = promptTextColumnLen(l->prompt,strlen(l->prompt));
     int colpos = columnPosForMultiLine(l->buf, l->len, l->len, l->cols, pcollen);
     int colpos2; /* cursor column position. */
     int rows = (pcollen+colpos+l->cols-1)/l->cols; /* rows used by current buf. */
@@ -808,8 +799,7 @@ int linenoiseEditInsert(struct linenoiseState *l, const char *cbuf, int clen) {
 /* Move cursor on the left. */
 void linenoiseEditMoveLeft(struct linenoiseState *l) {
     if (l->pos > 0) {
-        size_t col_len;
-        l->pos -= prevCharLen(l->buf,l->len,l->pos,&col_len);
+        l->pos -= prevCharLen(l->buf,l->len,l->pos,NULL);
         refreshLine(l);
     }
 }
@@ -817,8 +807,7 @@ void linenoiseEditMoveLeft(struct linenoiseState *l) {
 /* Move cursor on the right. */
 void linenoiseEditMoveRight(struct linenoiseState *l) {
     if (l->pos != l->len) {
-        size_t col_len;
-        l->pos += nextCharLen(l->buf,l->len,l->pos,&col_len);
+        l->pos += nextCharLen(l->buf,l->len,l->pos,NULL);
         refreshLine(l);
     }
 }
@@ -869,8 +858,7 @@ void linenoiseEditHistoryNext(struct linenoiseState *l, int dir) {
  * position. Basically this is what happens with the "Delete" keyboard key. */
 void linenoiseEditDelete(struct linenoiseState *l) {
     if (l->len > 0 && l->pos < l->len) {
-        size_t col_len;
-        int chlen = nextCharLen(l->buf,l->len,l->pos,&col_len);
+        int chlen = nextCharLen(l->buf,l->len,l->pos,NULL);
         memmove(l->buf+l->pos,l->buf+l->pos+chlen,l->len-l->pos-chlen);
         l->len-=chlen;
         l->buf[l->len] = '\0';
@@ -881,8 +869,7 @@ void linenoiseEditDelete(struct linenoiseState *l) {
 /* Backspace implementation. */
 void linenoiseEditBackspace(struct linenoiseState *l) {
     if (l->pos > 0 && l->len > 0) {
-        size_t col_len;
-        int chlen = prevCharLen(l->buf,l->len,l->pos,&col_len);
+        int chlen = prevCharLen(l->buf,l->len,l->pos,NULL);
         memmove(l->buf+l->pos-chlen,l->buf+l->pos,l->len-l->pos);
         l->pos-=chlen;
         l->len-=chlen;
