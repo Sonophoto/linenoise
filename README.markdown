@@ -1,4 +1,7 @@
 # Linenoise + yhirose Multi-byte patches
+
+### Original, Authentic Linenoise: https://github.com/antirez/linenoise
+
 ***
 **It appears that yhirose's patches support ANSI color codes.**
 ***
