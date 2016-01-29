@@ -1,5 +1,7 @@
-# Linenoise
-
+# Linenoise + yhirose Multi-byte patches
+***
+**It appears that yhirose's patches support ANSI color codes.**
+***
 A minimal, zero-config, BSD licensed, readline replacement used in Redis,
 MongoDB, and Android.
 
