@@ -201,28 +201,30 @@ size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_
 size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
 size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp);
 
-/* Get byte length and column length of the previous character */
+/*
+/* Get byte length and column length of the previous character
 static size_t defaultPrevCharLen(const char *buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf); UNUSED(buf_len); UNUSED(pos);
     if (col_len != NULL) *col_len = 1;
     return 1;
 }
 
-/* Get byte length and column length of the next character */
+/* Get byte length and column length of the next character
 static size_t defaultNextCharLen(const char *buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf); UNUSED(buf_len); UNUSED(pos);
     if (col_len != NULL) *col_len = 1;
     return 1;
 }
 
-/* Read bytes of the next character */
+/* Read bytes of the next character
 static size_t defaultReadCode(int fd, char *buf, size_t buf_len, int* c) {
     if (buf_len < 1) return -1;
     int nread = read(fd,&buf[0],1);
     if (nread == 1) *c = buf[0];
     return nread;
 }
-
+*/
+	
 /* HACKED: Changing default funcs to yhirose UTF-8 functions 
  * B.Young, 14-Nov-2016 */
 #define __LINENOISE_ENCODINGS_UTF8_H
