@@ -219,10 +219,12 @@ static size_t defaultReadCode(int fd, char *buf, size_t buf_len, int* c) {
     return nread;
 }
 
-/* Set default encoding functions */
-static linenoisePrevCharLen *prevCharLen = defaultPrevCharLen;
-static linenoiseNextCharLen *nextCharLen = defaultNextCharLen;
-static linenoiseReadCode *readCode = defaultReadCode;
+/* HACKED: Changing default funcs to yhirose UTF-8 functions 
+ * B.Young, 14-Nov-2016 */
+#define __LINENOISE_ENCODINGS_UTF8_H
+static linenoisePrevCharLen *prevCharLen = linenoiseUtf8PrevCharLen;
+static linenoiseNextCharLen *nextCharLen = linenoiseUtf8NextCharLen;
+static linenoiseReadCode *readCode = linenoiseUtf8ReadCode;
 
 /* Set used defined encoding functions */
 void linenoiseSetEncodingFunctions(
@@ -1232,10 +1234,8 @@ int linenoiseHistoryLoad(const char *filename) {
     return 0;
 }
 
-/* ================================ UTF-8 Encoding ================================= */
+/* ============================ UTF-8 Utilities ================================= */
 /* These functions are from Yuji Hirose, @yhirose on GitHub */
-
-/* ============================ UTF8 utilities ============================== */
 
 static unsigned long wideCharTable[][2] = {
     { 0x1100, 0x115F }, { 0x2329, 0x232A }, { 0x2E80, 0x2E99, }, { 0x2E9B, 0x2EF3, },
