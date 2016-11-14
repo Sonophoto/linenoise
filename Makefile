@@ -1,5 +1,5 @@
-linenoise_example:  
-	$(CC) -Wall -W -Os -g -o linenoise_example linenoise.c example.c
+utf8_example:  
+	$(CC) -Wall -W -Os -g -o utf8_example linenoise.c example.c
 
 clean:
-	rm -f linenoise_example
+	rm -f utf8_example
