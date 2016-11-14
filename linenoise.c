@@ -116,11 +116,45 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "linenoise.h"
+
+#define __LINENOISE_H
+
+typedef struct linenoiseCompletions {
+  size_t len;
+  char **cvec;
+} linenoiseCompletions;
+
+typedef void(linenoiseCompletionCallback)(const char *, linenoiseCompletions *);
+void linenoiseSetCompletionCallback(linenoiseCompletionCallback *);
+void linenoiseAddCompletion(linenoiseCompletions *, const char *);
+
+char *linenoise(const char *prompt);
+int linenoiseHistoryAdd(const char *line);
+int linenoiseHistorySetMaxLen(int len);
+int linenoiseHistorySave(const char *filename);
+int linenoiseHistoryLoad(const char *filename);
+void linenoiseClearScreen(void);
+void linenoiseSetMultiLine(int ml);
+void linenoisePrintKeyCodes(void);
+
+typedef size_t (linenoisePrevCharLen)(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+typedef size_t (linenoiseNextCharLen)(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+typedef size_t (linenoiseReadCode)(int fd, char* buf, size_t buf_len, int* cp);
+
+size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp);
+
+void linenoiseSetEncodingFunctions(
+    linenoisePrevCharLen *prevCharLenFunc,
+    linenoiseNextCharLen *nextCharLenFunc,
+    linenoiseReadCode *readCodeFunc);
 
 #define LINENOISE_DEFAULT_HISTORY_MAX_LEN 100
 #define LINENOISE_MAX_LINE 4096
+
 #define UNUSED(x) (void)(x)
+
 static char *unsupported_term[] = {"dumb","cons25","emacs",NULL};
 static linenoiseCompletionCallback *completionCallback = NULL;
 
@@ -196,10 +230,6 @@ FILE *lndebug_fp = NULL;
 #endif
 
 /* ========================== Encoding functions ============================= */
-
-size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
-size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
-size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp);
 
 /*
  Get byte length and column length of the previous character
