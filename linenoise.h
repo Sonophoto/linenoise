@@ -61,9 +61,9 @@ void linenoiseClearScreen(void);
 void linenoiseSetMultiLine(int ml);
 void linenoisePrintKeyCodes(void);
 
-typedef size_t (linenoisePrevCharLen)(const char *buf, size_t buf_len, size_t pos, size_t *col_len);
-typedef size_t (linenoiseNextCharLen)(const char *buf, size_t buf_len, size_t pos, size_t *col_len);
-typedef size_t (linenoiseReadCode)(int fd, char *buf, size_t buf_len, int* c);
+typedef size_t (linenoiseUtf8NextCharLen)(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+typedef size_t (linenoiseUtf8PrevCharLen)(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+typedef size_t (linenoiseUtf8ReadCode)(int fd, char* buf, size_t buf_len, int* cp);
 
 void linenoiseSetEncodingFunctions(
     linenoisePrevCharLen *prevCharLenFunc,
