@@ -1,10 +1,12 @@
-# Linenoise + yhirose Multi-byte patches
+# Linenoise + yhirose's UTF-8 patches BY DEFAULT in one file.
 
 ### Original, Authentic Linenoise: https://github.com/antirez/linenoise
 
-***
-**It appears that yhirose's patches support ANSI color codes.**
-***
+### yhirose's CPP version of Linenoise for M$-Windows: https://github.com/yhirose/cpp-linenoise
+
+
+---------------------------------------------------------------------------
+
 A minimal, zero-config, BSD licensed, readline replacement used in Redis,
 MongoDB, and Android.
 
