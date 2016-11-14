@@ -197,6 +197,10 @@ FILE *lndebug_fp = NULL;
 
 /* ========================== Encoding functions ============================= */
 
+size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len);
+size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp);
+
 /* Get byte length and column length of the previous character */
 static size_t defaultPrevCharLen(const char *buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf); UNUSED(buf_len); UNUSED(pos);
@@ -1516,7 +1520,7 @@ static size_t utf8BytesToCodePoint(const char* buf, size_t len, int* cp) {
 
 /* Get length of next grapheme
  */
-static size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
+size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
     size_t beg = pos;
     int cp;
     size_t len = utf8BytesToCodePoint(buf + pos, buf_len - pos, &cp);
@@ -1537,7 +1541,7 @@ static size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_
 
 /* Get length of previous grapheme
  */
-static size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
+size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf_len);
     size_t end = pos;
     while (pos > 0) {
@@ -1556,7 +1560,7 @@ static size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_
 
 /* Read a Unicode from file.
  */
-static size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp) {
+size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp) {
     if (buf_len < 1) return -1;
     size_t nread = read(fd,&buf[0],1);
     if (nread <= 0) return nread;
