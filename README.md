@@ -1,5 +1,11 @@
 # Linenoise + yhirose's UTF-8 patches BY DEFAULT in one file.
 
+This is a Single File Include:
+
+#include linenoise.c 
+
+at the top of your source file and you are all set. See utf8_test.c and the Makefile for details.
+
 ### Original, Authentic Linenoise: https://github.com/antirez/linenoise
 
 ### yhirose's CPP version of Linenoise for M$-Windows: https://github.com/yhirose/cpp-linenoise
