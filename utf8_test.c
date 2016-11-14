@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "linenoise.h"
+#include "linenoise.c"
 
 void completion(const char *buf, linenoiseCompletions *lc) {
     if (buf[0] == 'h') {
