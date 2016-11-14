@@ -222,9 +222,9 @@ static size_t defaultReadCode(int fd, char *buf, size_t buf_len, int* c) {
 /* HACKED: Changing default funcs to yhirose UTF-8 functions 
  * B.Young, 14-Nov-2016 */
 #define __LINENOISE_ENCODINGS_UTF8_H
-static linenoisePrevCharLen *prevCharLen = linenoiseUtf8PrevCharLen;
-static linenoiseNextCharLen *nextCharLen = linenoiseUtf8NextCharLen;
-static linenoiseReadCode *readCode = linenoiseUtf8ReadCode;
+static linenoisePrevCharLen *prevCharLen = Utf8PrevCharLen;
+static linenoiseNextCharLen *nextCharLen = Utf8NextCharLen;
+static linenoiseReadCode *readCode = Utf8ReadCode;
 
 /* Set used defined encoding functions */
 void linenoiseSetEncodingFunctions(
@@ -1516,7 +1516,7 @@ static size_t utf8BytesToCodePoint(const char* buf, size_t len, int* cp) {
 
 /* Get length of next grapheme
  */
-size_t linenoiseUtf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
+static size_t Utf8NextCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
     size_t beg = pos;
     int cp;
     size_t len = utf8BytesToCodePoint(buf + pos, buf_len - pos, &cp);
@@ -1537,7 +1537,7 @@ size_t linenoiseUtf8NextCharLen(const char* buf, size_t buf_len, size_t pos, siz
 
 /* Get length of previous grapheme
  */
-size_t linenoiseUtf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
+static size_t Utf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, size_t *col_len) {
     UNUSED(buf_len);
     size_t end = pos;
     while (pos > 0) {
@@ -1556,7 +1556,7 @@ size_t linenoiseUtf8PrevCharLen(const char* buf, size_t buf_len, size_t pos, siz
 
 /* Read a Unicode from file.
  */
-size_t linenoiseUtf8ReadCode(int fd, char* buf, size_t buf_len, int* cp) {
+static size_t Utf8ReadCode(int fd, char* buf, size_t buf_len, int* cp) {
     if (buf_len < 1) return -1;
     size_t nread = read(fd,&buf[0],1);
     if (nread <= 0) return nread;
